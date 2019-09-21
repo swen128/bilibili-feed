@@ -1,0 +1,35 @@
+service: bilibili-feed
+
+plugins:
+  - serverless-python-requirements
+  - serverless-prune-plugin
+
+provider:
+  name: aws
+  runtime: python3.7
+  region: us-east-1
+  logRetentionInDays: 30
+  stage: ${opt:stage, 'dev'}
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+  prune:
+    automatic: true
+    number: 10
+
+package:
+  exclude:
+    - node_modules/**
+    - tests/**
+    - venv/**
+    - .pytest_cache/**
+    - .idea/**
+
+functions:
+  Feed:
+    handler: src.handler.endpoint
+    events:
+      - http:
+          path: feed
+          method: get
