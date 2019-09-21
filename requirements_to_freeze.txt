@@ -1,3 +1,4 @@
 requests
+requests_mock
 dataclasses_jsonschema
 feedgen
