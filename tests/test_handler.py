@@ -62,3 +62,18 @@ def test_unknown_bilibili_respone():
         statusCode=500,
         body='Internal server error.'
     )
+
+
+def test_request_exception():
+    uid = '436596841'
+    event = {'queryStringParameters': {'uid': uid}}
+
+    with requests_mock.Mocker() as m:
+        m.get(bilibili_api_url, status_code=500)
+
+        response = endpoint(event, context={})
+
+    assert response == dict(
+        statusCode=503,
+        body='The server could not connect to the bilibili dynamic API.'
+    )
