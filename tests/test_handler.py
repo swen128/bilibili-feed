@@ -6,11 +6,28 @@ from tests.utils import read_file
 bilibili_api_url = 'https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/space_history'
 
 
-def test_valid_request():
+def test_valid_request_0():
     uid = '436596841'
     event = {'queryStringParameters': {'uid': uid}}
-    true_output = read_file('tests/resources/true_output.xml')
-    bilibili_response = read_file('tests/resources/response.json')
+    true_output = read_file('tests/resources/atom_feed/valid_0.xml')
+    bilibili_response = read_file('tests/resources/bilibili_api_response/valid_0.json')
+
+    with requests_mock.Mocker() as m:
+        m.get(bilibili_api_url, text=bilibili_response)
+
+        response = endpoint(event, context={})
+
+    assert response == dict(
+        statusCode=200,
+        body=true_output
+    )
+
+
+def test_valid_request_1():
+    uid = '410455162'
+    event = {'queryStringParameters': {'uid': uid}}
+    true_output = read_file('tests/resources/atom_feed/valid_1.xml')
+    bilibili_response = read_file('tests/resources/bilibili_api_response/valid_1.json')
 
     with requests_mock.Mocker() as m:
         m.get(bilibili_api_url, text=bilibili_response)
@@ -35,7 +52,7 @@ def test_invalid_request():
 def test_empty_bilibili_response():
     uid = 'place holder'
     event = {'queryStringParameters': {'uid': uid}}
-    bilibili_response = read_file('tests/resources/empty_response.json')
+    bilibili_response = read_file('tests/resources/bilibili_api_response/empty.json')
 
     with requests_mock.Mocker() as m:
         m.get(bilibili_api_url, text=bilibili_response)
@@ -51,7 +68,7 @@ def test_empty_bilibili_response():
 def test_unknown_bilibili_respone():
     uid = '436596841'
     event = {'queryStringParameters': {'uid': uid}}
-    bilibili_response = read_file('tests/resources/unknown_response.json')
+    bilibili_response = read_file('tests/resources/bilibili_api_response/unknown_format.json')
 
     with requests_mock.Mocker() as m:
         m.get(bilibili_api_url, text=bilibili_response)

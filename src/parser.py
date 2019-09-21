@@ -1,7 +1,7 @@
 import json
 from datetime import datetime, timezone
 
-from feedgen.feed import FeedGenerator
+from feedgen.feed import FeedGenerator, FeedEntry
 
 
 class BilibiliEmptyResponseException(Exception):
@@ -10,6 +10,58 @@ class BilibiliEmptyResponseException(Exception):
 
 class BilibiliUnknownResponseException(Exception):
     pass
+
+
+def parse_card_to_entry(card: dict) -> FeedEntry:
+    entry = FeedEntry()
+
+    desc = card['desc']
+    dynamic_id = str(desc['dynamic_id'])
+    timestamp = datetime.fromtimestamp(desc['timestamp'], tz=timezone.utc)
+
+    link = f'https://t.bilibili.com/{dynamic_id}'
+    card_dic = json.loads(card['card'])
+
+    if 'aid' in card_dic:
+        aid = card_dic['aid']
+        title = card_dic['title']
+        thumbnail = card_dic['pic']
+        video_url = f'https://www.bilibili.com/video/av{aid}'
+        content = video_url
+
+        entry.link(href=video_url, rel='related')
+    elif 'item' in card_dic:
+        user_name = desc['user_profile']['info']['uname']
+        title = f'post from {user_name}'
+        item = card_dic['item']
+
+        if 'pictures' in item:
+            content = item['description']
+            thumbnail = item['pictures'][0]['img_src']
+        elif 'video_playurl' in item:
+            content = item['description']
+            cover = item['cover']
+            thumbnail = cover.get('unclipped') or cover['default']
+        elif 'origin' in card_dic:
+            origin_id = card_dic['item']['orig_dy_id']
+            origin_url = f'https://t.bilibili.com/{origin_id}'
+            reply_text = item['content']
+            content = f'{reply_text}\n\nin reply to: {origin_url}'
+            thumbnail = card_dic['user']['face']
+        else:
+            content = item['content']
+            thumbnail = card_dic['user']['face']
+    else:
+        raise ValueError()
+
+    entry.id(dynamic_id)
+    entry.link(href=link, rel='alternate', type='text/html')
+    entry.link(href=thumbnail, rel='enclosure', type='image/jpeg')
+    entry.title(title)
+    entry.content(content)
+    entry.updated(timestamp)
+
+    return entry
 
 
 def parse_bilibili_dynamic_to_feed(response: dict) -> str:
@@ -31,46 +83,14 @@ def parse_bilibili_dynamic_to_feed(response: dict) -> str:
         feed.title(feed_title)
         feed.updated(last_updated)
         feed.language('cn')
+    except:
+        raise BilibiliUnknownResponseException()
 
-        for card in cards:
-            desc = card['desc']
-            dynamic_id = str(desc['dynamic_id'])
-            timestamp = datetime.fromtimestamp(desc['timestamp'], tz=timezone.utc)
+    for card in cards:
+        entry = parse_card_to_entry(card)
+        feed.add_entry(feedEntry=entry)
 
-            link = f'https://t.bilibili.com/{dynamic_id}'
-            card_dic = json.loads(card['card'])
-
-            entry = feed.add_entry()
-
-            if 'aid' in card_dic:
-                aid = card_dic['aid']
-                title = card_dic['title']
-                thumbnail = card_dic['pic']
-                video_url = f'https://www.bilibili.com/video/av{aid}'
-                content = video_url
-
-                entry.link(href=video_url, rel='related')
-            elif 'item' in card_dic:
-                title = feed_title
-                item = card_dic['item']
-                content = item['content']
-                thumbnail = card_dic['user']['face']
-
-                if 'origin' in card_dic:
-                    origin_id = card_dic['item']['orig_dy_id']
-                    origin_url = f'https://t.bilibili.com/{origin_id}'
-                    content += f'\n\nin reply to: {origin_url}'
-
-            else:
-                raise ValueError()
-
-            entry.id(dynamic_id)
-            entry.link(href=link, rel='alternate', type='text/html')
-            entry.link(href=thumbnail, rel='enclosure', type='image/jpeg')
-            entry.title(title)
-            entry.content(content)
-            entry.updated(timestamp)
-
+    try:
         atom_str = feed.atom_str(pretty=True).decode('utf-8')
         return atom_str
     except:
