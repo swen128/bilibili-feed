@@ -47,9 +47,9 @@ def parse_bilibili_dynamic_to_feed(response: dict) -> str:
                 title = card_dic['title']
                 thumbnail = card_dic['pic']
                 video_url = f'https://www.bilibili.com/video/av{aid}'
-                content = ''
+                content = video_url
 
-                entry.link(href=video_url, rel='enclosure')
+                entry.link(href=video_url, rel='related')
             elif 'item' in card_dic:
                 title = feed_title
                 item = card_dic['item']
