@@ -1,8 +1,8 @@
 import json
+from datetime import datetime, timezone
 
 import requests
 from feedgen.feed import FeedGenerator
-from datetime import datetime, timezone
 
 
 def parse(response: dict) -> FeedGenerator:
