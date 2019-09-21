@@ -81,6 +81,23 @@ def test_unknown_bilibili_respone():
     )
 
 
+def test_partially_unknown_bilibili_response():
+    uid = '436596841'
+    event = {'queryStringParameters': {'uid': uid}}
+    true_output = read_file('tests/resources/atom_feed/partially_unknown_format.xml')
+    bilibili_response = read_file('tests/resources/bilibili_api_response/partially_unknown_format.json')
+
+    with requests_mock.Mocker() as m:
+        m.get(bilibili_api_url, text=bilibili_response)
+
+        response = endpoint(event, context={})
+
+    assert response == dict(
+        statusCode=200,
+        body=true_output
+    )
+
+
 def test_request_exception():
     uid = '436596841'
     event = {'queryStringParameters': {'uid': uid}}

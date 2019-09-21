@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="cn">
+  <id>https://space.bilibili.com/436596841/dynamic</id>
+  <title>莉泽Official - bilibili dynamic</title>
+  <updated>2019-09-20T09:42:43+00:00</updated>
+  <link href="https://space.bilibili.com/436596841/dynamic" rel="alternate"/>
+  <generator uri="http://lkiesow.github.io/python-feedgen" version="0.8.0">python-feedgen</generator>
+  <entry>
+    <id>301223936423351993</id>
+    <title>post from 莉泽Official</title>
+    <updated>2019-09-20T09:42:43+00:00</updated>
+    <content>bilibili动画的大家好久不见！
+从上海回到了赫露艾斯塔！今天20点开始直播！
+虽然过了一段时间，今天打算杂谈些上海的回忆，
+还有跟VirtuaReal的后辈们的事情哦！</content>
+    <link href="https://t.bilibili.com/301223936423351993" rel="alternate" type="text/html"/>
+    <link href="https://i1.hdslb.com/bfs/face/c6557b71d881c32607b1e64f3989ef38b30a1a9e.jpg" rel="enclosure" type="image/jpeg"/>
+  </entry>
+</feed>

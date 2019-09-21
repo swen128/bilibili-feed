@@ -87,8 +87,11 @@ def parse_bilibili_dynamic_to_feed(response: dict) -> str:
         raise BilibiliUnknownResponseException()
 
     for card in cards:
-        entry = parse_card_to_entry(card)
-        feed.add_entry(feedEntry=entry)
+        try:
+            entry = parse_card_to_entry(card)
+            feed.add_entry(feedEntry=entry)
+        except:
+            pass
 
     try:
         atom_str = feed.atom_str(pretty=True).decode('utf-8')
