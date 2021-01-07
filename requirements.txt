@@ -7,7 +7,7 @@ feedgen==0.8.0
 idna==2.8
 importlib-metadata==0.23
 jsonschema==3.0.2
-lxml==4.4.1
+lxml==4.6.2
 more-itertools==7.2.0
 mypy-extensions==0.4.1
 packaging==19.2
